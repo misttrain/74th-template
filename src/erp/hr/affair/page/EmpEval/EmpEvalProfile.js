@@ -9,9 +9,11 @@ import AnimateButton from 'template/ui-component/extended/AnimateButton';
 // assets
 import Avatar1 from 'assets/images/users/avatar-7.png';
 import ErrorTwoToneIcon from '@mui/icons-material/ErrorTwoTone';
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
 import {number} from 'prop-types';
 import moment from "moment";
+import axios from "axios";
+
 // ==============================|| EXCUSED PROFILE ||============================== //
 
 function EmpEvalProfile(props){
@@ -50,7 +52,7 @@ function EmpEvalProfile(props){
     // 종료 시간
     const [endTime,setendTime] = useState('');
 
-
+    const [selectData, setSelectData] = useState([]);
 
 
     const insertEXAttd = () => {
@@ -132,6 +134,23 @@ function EmpEvalProfile(props){
     }
 
     /* 시간 선택 함수 */
+    useEffect(() => {
+        axios.get(
+            "http://localhost:9101/empinfomgmt/empreallist"
+        ).then(response => {
+            console.log("list1111",response.data.list);
+            setSelectData(response.data.list)
+        })
+            .catch(e => {
+                console.log("!!!!!!!!!!!!" + e);
+            });
+    }, []);
+
+    const empList =selectData.map(
+        (e)=> {
+            return <MenuItem value={e.empCode}>{e.empName}</MenuItem>
+        }
+    )
 
     return(
         <Grid container spacing={gridSpacing}>
@@ -155,15 +174,9 @@ function EmpEvalProfile(props){
                     <FormControl fullWidth>
                         <InputLabel id="demo-simple-select-label">평가대상직원</InputLabel>
                         <Select
-                            value={restTypeName}
                             label="평가대상직원"
-                            onChange={(event)=>{
-                                setRestTypeName(event.target.value);
-                                if(event.target.value=="bb"){setRestTypeCode("bb");}
-
-                            }}
-                        >
-                            <MenuItem value={"직원axios로받아오기"}>직원axios로받아오기</MenuItem>
+                            >
+                            {empList}
 
                         </Select>
                     </FormControl>
